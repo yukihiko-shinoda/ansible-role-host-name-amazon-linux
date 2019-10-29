@@ -1,3 +1,15 @@
 ---
-- include_tasks: set_host_name.yml
-- include_tasks: set_ssl_config.yml
+- name: update host name
+  hostname:
+    name: "{{ roles_common_host_name }}.{{ roles_common_domain_name }}"
+
+- name: add myself to /etc/hosts
+  replace:
+    path: /etc/hosts
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - regexp: ^(127\.0\.0\.1[\s\t]+)(.*)$
+      replace: '\1{{ roles_common_host_name }}.{{ roles_common_domain_name }} {{ roles_common_host_name }} \2'
+    - regexp: ^(::1[\s\t]+)(.*)$
+      replace: '\1{{ roles_common_host_name }}.{{ roles_common_domain_name }} {{ roles_common_host_name }} \2'
